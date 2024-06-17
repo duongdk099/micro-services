@@ -1,0 +1,4 @@
+node_modules/
+.env
+API Gateway/node_modules/
+Auth/node_modules/
