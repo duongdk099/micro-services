@@ -36,40 +36,25 @@ userSchema.plugin(uniqueValidator, {
   message: "E-mail address is already in use.",
 });
 
-userSchema.pre("save", function (next) {
+userSchema.pre("save", async function (next) {
   const user = this;
 
   // Only hash the password if it has been modified (or is new)
   if (!user.isModified("password")) return next();
 
-  // Generate a salt
-  bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
-    if (err) return next(err);
+  try {
+    // Generate a salt
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
 
     // Hash the password using our new salt
-    bcrypt.hash(user.password, salt, function (err, hash) {
-      if (err) return next(err);
+    const hash = await bcrypt.hash(user.password, salt);
 
-      // Override the cleartext password with the hashed one
-      user.password = hash;
-      next();
-    });
-  });
-});
-
-userSchema.pre("findOneAndUpdate", async function (next) {
-  const update = this.getUpdate();
-
-  if (update.$set.password) {
-    try {
-      const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-      const hash = await bcrypt.hash(update.$set.password, salt);
-      this.getUpdate().$set.password = hash;
-    } catch (err) {
-      return next(err);
-    }
+    // Override the cleartext password with the hashed one
+    user.password = hash;
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 });
 
 const User = mongoose.model("User", userSchema);
