@@ -1,5 +1,4 @@
 services:
-
   mongo:
     image: mongo:latest
     container_name: mongo
@@ -41,6 +40,21 @@ services:
           target: /
           action: sync
         - path: ./Auth/package.json
+          action: rebuild
+
+  product:
+    build:
+      context: ./Product
+      dockerfile: Dockerfile
+    container_name: product
+    depends_on:
+      - mongo
+    develop:
+      watch:
+        - path: ./Product/
+          target: /
+          action: sync
+        - path: ./Product/package.json
           action: rebuild
 volumes:
   db_datas:

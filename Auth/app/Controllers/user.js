@@ -32,9 +32,13 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password." });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
-      expiresIn: Number(process.env.TOKEN_EXPIRATION),
-    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: Number(process.env.TOKEN_EXPIRATION),
+      }
+    );
 
     res.status(200).json({ token, user });
   } catch (err) {
@@ -44,6 +48,5 @@ exports.login = async (req, res) => {
   }
 };
 exports.getUserInfoFromToken = (req, res) => {
-    const { id, role } = req.userData;
-    res.status(200).json({ id, role });
-  };
+  res.status(200).json({ id: req.auth.id, role: req.auth.role });
+};
