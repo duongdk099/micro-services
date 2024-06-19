@@ -4,10 +4,11 @@ const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     const user = new User({
       email: email,
       password: password,
+      role: role, // Add this line to accept role during signup
     });
     await user.save();
     res.status(201).json(user);
@@ -42,3 +43,7 @@ exports.login = async (req, res) => {
     });
   }
 };
+exports.getUserInfoFromToken = (req, res) => {
+    const { id, role } = req.userData;
+    res.status(200).json({ id, role });
+  };

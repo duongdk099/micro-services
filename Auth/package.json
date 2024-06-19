@@ -18,6 +18,7 @@
     "mongoose-unique-validator": "^5.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "nodemon": "^3.1.3"
   }
 }

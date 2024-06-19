@@ -1,0 +1,46 @@
+services:
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=mongopass
+    volumes:
+      - db_datas:/data/db
+
+  api-gateway:
+    build:
+      context: ./API Gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth
+    develop:
+      watch:
+        - path: ./API\ Gateway/
+          target: /
+          action: sync
+        - path: ./API\ Gateway/package.json
+          action: rebuild
+
+  auth:
+    build:
+      context: ./Auth
+      dockerfile: Dockerfile
+    container_name: auth
+    depends_on:
+      - mongo
+    develop:
+      watch:
+        - path: ./Auth/
+          target: /
+          action: sync
+        - path: ./Auth/package.json
+          action: rebuild
+volumes:
+  db_datas:
